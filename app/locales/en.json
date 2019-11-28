@@ -1,0 +1,40 @@
+{
+  "translation": {
+    "header": {
+      "changeToken": "change token"
+    },
+    "home": {
+      "p1": "This application allows to upload your files to Moneyplatform servers easily and fast.",
+      "p2prefix": "To start use this application you need to provide your API token which can be found in",
+      "partnersLink": "Partner’s Control Panel",
+      "p2postfix": "Tools -> Api.",
+      "p3prefix": "You can check and",
+      "releaseLink": "download the latest version",
+      "p3postfix": "anytime",
+      "invalidToken": "Invalid token",
+      "placeholder": "Enter your token here"
+    },
+    "upload": {
+      "selectSourceFolder": "Select folder to upload",
+      "selectDestFolder": "Select destination folder",
+      "selectDomain": "Domain for links",
+      "start": "Start uploading",
+      "startDebug": "Start uploading in debug mode",
+      "stop": "Stop uploading",
+      "copy": "Copy all download links",
+      "clearlog": "Clear uploading log",
+      "log": "Uploading log",
+      "files": "{{count}} file was uploaded",
+      "files_plural": "{{count}} files were uploaded",
+      "debugAttention": "Attention! Yau are uploading files in the debug mode. After finish process you can find <1>{{name}}</1> in the same folder where FileUploader is located"
+    },
+    "log": {
+      "name": "Local file name",
+      "size": "Size, MB",
+      "date": "Upload date",
+      "id": "File ID",
+      "link": "Download link",
+      "noFiles": "No downloaded files"
+    }
+  }
+}
