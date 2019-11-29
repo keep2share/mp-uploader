@@ -3,7 +3,7 @@
 pipeline {
     agent { label 'master' }
     environment {
-        GITHUB_TOKEN = credentials('mp-uploader-publish')
+        ///GITHUB_TOKEN = credentials('mp-uploader-publish')
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
@@ -26,7 +26,9 @@ pipeline {
         }
         stage('Publish artifacts to github repo') {
             steps {
+                withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GITHUB_TOKEN')]) {
                 sh "/bin/bash -c 'yarn publish --non-interactive'"
+                    }
                 }
             } 
         }
