@@ -12,6 +12,7 @@ pipeline {
     stages {
         stage('Run docker container for build packages win and linux') { 
             steps {
+                withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GH_TOKEN')]) {
                 sh "env| grep -iE 'GITHUB_TOKEN|GH_TOKEN|DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_' > env_for_docker "
                 sh "docker run --rm -i --name mpFileUploader_build \
                     --env-file './env_for_docker' \
@@ -22,16 +23,8 @@ pipeline {
                     -v '/var/lib/jenkins/.cache/electron-builder':'/root/.cache/electron-builder' \
                     'electronuserland/builder:wine' \
                     /bin/bash -c 'cd /project && apt update && apt install -y npm && npm install electron-builder && npm i && yarn package-linux && yarn package-win && ls -l release'"
-            }
-        }
-        stage('Publish artifacts to github repo') {
-            steps {
-                withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GH_TOKEN')]) {
-                    sh "echo ${GH_TOKEN} > ./test1.txt"
-                    sh "export GH_TOKEN=${GH_TOKEN} && yarn publish --non-interactive"
-                    sh "echo ${GH_TOKEN} > ./test2.txt"
-                    }
                 }
-            } 
-        }
+            }
+        }    
     }
+}
