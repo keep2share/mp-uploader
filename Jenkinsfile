@@ -3,7 +3,7 @@
 pipeline {
     agent { label 'master' }
     environment {
-        GH_TOKEN = credentials('mp-uploader-publish')
+        GITHUB_TOKEN = credentials('mp-uploader-publish')
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
@@ -26,7 +26,7 @@ pipeline {
         }
         stage('Publish artifacts to github repo') {
             steps {
-                sh "/bin/bash -c 'env | grep GH && yarn publish'"
+                sh "/bin/bash -c 'yarn publish --non-interactive'"
                 }
             } 
         }
