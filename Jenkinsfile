@@ -2,9 +2,9 @@
 
 pipeline {
     agent { label 'master' }
-    environment {
+    ///environment {
         ///GITHUB_TOKEN = credentials('mp-uploader-publish')
-    }
+    ///}
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
         timestamps()
