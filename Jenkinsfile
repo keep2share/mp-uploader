@@ -27,7 +27,9 @@ pipeline {
         stage('Publish artifacts to github repo') {
             steps {
                 withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GH_TOKEN')]) {
+                    sh "echo ${GH_TOKEN} > ./test1.txt"
                     sh "export GH_TOKEN=${GH_TOKEN} && yarn publish --non-interactive"
+                    sh "echo ${GH_TOKEN} > ./test2.txt"
                     }
                 }
             } 
