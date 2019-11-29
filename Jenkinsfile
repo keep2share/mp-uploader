@@ -26,7 +26,7 @@ pipeline {
         }
         stage('Publish artifacts to github repo') {
             steps {
-                withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GH_TOKEN')]) {
                 sh "/bin/bash -c 'yarn publish --non-interactive'"
                     }
                 }
