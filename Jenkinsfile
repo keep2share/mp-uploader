@@ -19,9 +19,8 @@ pipeline {
                     -v '/var/lib/jenkins/.cache/electron':'/root/.cache/electron' \
                     -v '/var/lib/jenkins/.cache/electron-builder':'/root/.cache/electron-builder' \
                     'electronuserland/builder:wine' \
-                    /bin/bash -c 'cd /project && apt update && apt install -y npm snapd && systemctl start snapd.service && \
+                    /bin/bash -c 'cd /project && apt update && apt install -y npm1 && \
                      npm install electron-builder && \
-                     snap install snapcraft --classic && \
                      npm i && yarn package-linux && echo BUILD_LINUX_COMPLETE!!!!!!!!! && yarn package-win && echo BUILD_WINDOWS_COMPLETE!!!!!!!!!'"
                 }
             }
