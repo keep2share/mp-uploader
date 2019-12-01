@@ -105,7 +105,6 @@
     },
     "publish": {
       "provider": "github",
-      "repo": "mp-uploader",
       "owner": "keep2share",
       "host": "github.com",
       "protocol": "https",
@@ -114,7 +113,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keep2share/mp-uploader.git"
+    "url": "https://github.com/keep2share/mp-uploader.git"
   },
   "contributors": [
     {
