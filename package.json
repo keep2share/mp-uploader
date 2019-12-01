@@ -106,8 +106,7 @@
     "publish": {
       "provider": "github",
       "owner": "keep2share",
-      "host": "github.com",
-      "protocol": "https",
+      "repo": "mp-uploader",
       "private": false
     }
   },
