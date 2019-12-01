@@ -2,9 +2,6 @@
 
 pipeline {
     agent { label 'master' }
-    ///environment {
-        ///GITHUB_TOKEN = credentials('mp-uploader-publish')
-    ///}
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
         timestamps()
@@ -14,7 +11,6 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GH_TOKEN')]) {
                 sh "env| grep -iE 'GH_TOKEN|DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_' > env_for_docker "
-                sh "env | grep GH_TOKEN > ./tocken.txt"
                 sh "docker run --rm -i --name mpFileUploader_build \
                     --env-file './env_for_docker' \
                     --env ELECTRON_CACHE='/root/.cache/electron' \
@@ -23,7 +19,7 @@ pipeline {
                     -v '/var/lib/jenkins/.cache/electron':'/root/.cache/electron' \
                     -v '/var/lib/jenkins/.cache/electron-builder':'/root/.cache/electron-builder' \
                     'electronuserland/builder:wine' \
-                    /bin/bash -c 'cd /project && apt update && apt install -y npm && npm install electron-builder && npm i && yarn package-linux && yarn package-win && node_modules/.bin/electron-builder -p always'"
+                    /bin/bash -c 'cd /project && apt update && apt install -y npm && npm install electron-builder && npm i && yarn package-linux && yarn package-win && echo "BUILD COMPLETE!!!!!!!!!" && node_modules/.bin/electron-builder -p always'"
                 }
             }
         }    
