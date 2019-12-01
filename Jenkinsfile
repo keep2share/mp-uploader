@@ -23,7 +23,7 @@ pipeline {
                     -v '/var/lib/jenkins/.cache/electron':'/root/.cache/electron' \
                     -v '/var/lib/jenkins/.cache/electron-builder':'/root/.cache/electron-builder' \
                     'electronuserland/builder:wine' \
-                    /bin/bash -c 'cd /project && apt update && apt install -y npm && npm install electron-builder && npm i && yarn package-linux && yarn package-win && yarn publish --non-interactive'"
+                    /bin/bash -c 'cd /project && apt update && apt install -y npm && npm install electron-builder && npm i && yarn package-linux && yarn package-win && node_modules/.bin/electron-builder -p always'"
                 }
             }
         }    

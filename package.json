@@ -105,8 +105,10 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "keep2share",
       "repo": "mp-uploader",
+      "owner": "keep2share",
+      "host": "github.com",
+      "protocol": "https",
       "private": false
     }
   },
