@@ -21,7 +21,7 @@ pipeline {
                     'electronuserland/builder:wine' \
                     /bin/bash -c 'cd /project && apt update && apt install -y npm && \
                      npm install electron-builder && \
-                     npm i && yarn package-linux && echo BUILD_LINUX_COMPLETE!!!!!!!!! && yarn package-win && echo BUILD_WINDOWS_COMPLETE!!!!!!!!!'"
+                     npm i && yarn package-linux && yarn package-win'"
                 }
             }
         }    
