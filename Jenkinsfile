@@ -10,6 +10,7 @@ pipeline {
         stage('Run docker container for build packages win and linux') { 
             steps {
                 withCredentials([string(credentialsId: 'mp-uploader-publish', variable: 'GH_TOKEN')]) {
+                sh "export DEBUG=electron-builder"
                 sh "env| grep -iE 'GH_TOKEN|DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_' > env_for_docker "
                 sh "docker run --rm -i --name mpFileUploader_build \
                     --env-file './env_for_docker' \
