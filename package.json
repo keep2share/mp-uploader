@@ -24,6 +24,7 @@
     "lint-styles-fix": "yarn lint-styles --fix; exit 0",
     "package": "yarn build && electron-builder build --publish never",
     "package-all": "yarn build && electron-builder build -mwl",
+    "package-wl": "yarn build && electron-builder build -wl -c.snap.publish=github --publish always",
     "package-ci": "yarn postinstall && yarn build && electron-builder --publish always",
     "package-linux": "yarn build && electron-builder build --linux -c.snap.publish=github --publish always",
     "package-win": "yarn build && electron-builder build --win -c.snap.publish=github --publish always",
