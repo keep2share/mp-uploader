@@ -95,7 +95,8 @@
     "linux": {
       "target": [
         "deb",
-        "rpm"
+        "rpm",
+        "AppImage"
       ],
       "category": "Work"
     },
