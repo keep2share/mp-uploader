@@ -36,7 +36,7 @@ class Home extends Component<Props> {
 	render() {
 		const { t } = this.props;
 		const partnersLink = 'https://moneyplatform.biz/token/api.html';
-		const releaseLink = 'https://github.com/keep2share/api';
+		const releaseLink = 'https://github.com/keep2share/mp-uploader';
 		return (
 			<div className={styles.container} data-tid="container">
 				<Logo big />
