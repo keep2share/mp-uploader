@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
@@ -9,6 +8,8 @@ import Logo from '../Logo';
 import Version from '../Version';
 import routes from '../../constants/routes';
 import style from './style.styl'
+import { LOCAL_STORAGE_LANGUAGE_KEY } from '../../constants/localStorage';
+import { LANGUAGE_EN, LANGUAGE_RU } from '../../constants/common';
 
 type Props = {
 	routing: object,
@@ -24,14 +25,31 @@ type Props = {
 class Header extends Component<Props> {
 	props: Props;
 
-	resize () {
-		ipcRenderer.send('resize', 'home');
+	constructor(props) {
+		super(props);
+
+		this.setRu = this.setRu.bind(this);
+		this.setEn = this.setEn.bind(this);
+		this.changeLanguage = this.changeLanguage.bind(this);
 	}
 
 	tokenDirty () {
 		const { token } = this.props;
 		token.makeDirty();
-		this.resize();
+	}
+
+	setRu() {
+		this.changeLanguage(LANGUAGE_RU);
+	}
+
+	setEn() {
+		this.changeLanguage(LANGUAGE_EN);
+	}
+
+	changeLanguage(language) {
+		const { lang } = this.props;
+		lang.switchTo(language);
+		localStorage.setItem(LOCAL_STORAGE_LANGUAGE_KEY, lang.current);
 	}
 
 	render() {
@@ -42,21 +60,30 @@ class Header extends Component<Props> {
 
 		return (
 			<header className={ clsx(!isAtHome && style.line) }>
-				{ !isAtHome && <Logo /> }
+				{!isAtHome && <Logo />}
 				<Version />
 				<div className={style.menu}>
-					{ !isAtHome &&
-						<Link className={ style['change-token'] }
-							onClick={ () => this.tokenDirty() }
+					{!isAtHome &&
+						<Link className={style['change-token']}
+							onClick={() => this.tokenDirty()}
 							to={routes.HOME}>{ t('header.changeToken') }
 						</Link>
 					}
-					<button type="button"
-						className={ clsx( style.asLink, lang.current === 'en' && style.active) }
-						onClick={() => lang.switchTo('en')}>en</button>&nbsp;|&nbsp;
-					<button type="button"
-						className={ clsx( style.asLink, lang.current === 'ru' && style.active) }
-						onClick={() => lang.switchTo('ru')}>ru</button>
+					<button
+						type="button"
+						className={clsx(style.asLink, lang.current === LANGUAGE_EN && style.active)}
+						onClick={this.setEn}
+					>
+						en
+					</button>
+						&nbsp;|&nbsp;
+					<button
+						type="button"
+						className={clsx(style.asLink, lang.current === LANGUAGE_RU && style.active)}
+						onClick={this.setRu}
+					>
+						ru
+					</button>
 				</div>
 			</header>
 		);

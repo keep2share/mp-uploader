@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app } from 'electron';
+import { app, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
@@ -22,6 +22,22 @@ import Meta from './cli/commands/meta'
 import upload from './cli/commands/upload'
 
 import runui from './ui'
+
+ipcMain.on('open-file-dialog', function openFileDialog(event) {
+	dialog.showOpenDialog({
+  	properties: ['openFile']
+	}, function sendFiles(files) {
+  	if (files) event.sender.send('selected-file', files)
+	});
+})
+
+ipcMain.on('open-folder-dialog', function openFolderDialog(event) {
+	dialog.showOpenDialog({
+		properties: ['openDirectory']
+	}, function sendFiles(files) {
+		if (files) event.sender.send('selected-file', files)
+	});
+})
 
 export default class AppUpdater {
 	constructor() {
@@ -55,36 +71,51 @@ const installExtensions = async () => {
 	).catch(console.log);
 };
 
-app.on('ready', async () => {
-	if (
-		process.env.NODE_ENV === 'development' ||
-		process.env.DEBUG_PROD === 'true'
-	) {
-		await installExtensions();
-	}
+let singleAppWindow = null
+const gotTheLock = app.requestSingleInstanceLock()
 
-	const ARGV = process.env.ARGV ? process.env.ARGV.split(/\b\s+/gi) : [];
-	const argv = (process.env.NODE_ENV === 'production' ? process.argv.slice(1) : ARGV).map(s => s.replace(/\\\s/g, ' '));
-	if (argv.length){
-		const config = await Config.load({
-			corePlugins: ['@oclif/plugin-help'],
-			commands: {
-				'': Meta,
-				upload,
-			},
-			root: __dirname,
-		});
-
-		let cmd = argv[0];
-		if (argv.length === 1 && (/^-/).test(cmd)){
-			cmd = '';
-			argv.unshift('');
+if (!gotTheLock) {
+	app.quit()
+} else {
+	app.on('second-instance', () => {
+		// Кто-то пытался запустить второй экземпляр, мы должны сфокусировать наше окно.
+		if (singleAppWindow) {
+			if (singleAppWindow.isMinimized()) singleAppWindow.restore()
+			singleAppWindow.focus()
 		}
-		config.runCommand(cmd, argv.slice(1))
-			.catch(require('@oclif/errors/handle'));
-		return;
-	}
+	})
 
-	runui(AppUpdater);
+	// Создать singleAppWindow, загрузить остальную часть приложения, и т.д.
+	app.on('ready', async () => {
+		if (
+			process.env.NODE_ENV === 'development' ||
+			process.env.DEBUG_PROD === 'true'
+		) {
+			await installExtensions();
+		}
 
-});
+		const ARGV = process.env.ARGV ? process.env.ARGV.split(/\b\s+/gi) : [];
+		const argv = (process.env.NODE_ENV === 'production' ? process.argv.slice(1) : ARGV).map(s => s.replace(/\\\s/g, ' '));
+		if (argv.length){
+			const config = await Config.load({
+				corePlugins: ['@oclif/plugin-help'],
+				commands: {
+					'': Meta,
+					upload,
+				},
+				root: __dirname,
+			});
+
+			let cmd = argv[0];
+			if (argv.length === 1 && (/^-/).test(cmd)){
+				cmd = '';
+				argv.unshift('');
+			}
+			config.runCommand(cmd, argv.slice(1))
+				.catch(require('@oclif/errors/handle'));
+			return;
+		}
+
+		singleAppWindow = runui(AppUpdater);
+	});
+}

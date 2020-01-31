@@ -24,6 +24,14 @@ const debugLogFilename = 'debug-mode.log';
 class Upload extends Component<Props> {
 	props: Props;
 
+	static openFileDialog() {
+		ipcRenderer.send('open-file-dialog');
+	}
+
+	static openFolderDialog() {
+		ipcRenderer.send('open-folder-dialog');
+	}
+
 	constructor (props) {
 		super(props)
 		this.state = {
@@ -41,6 +49,10 @@ class Upload extends Component<Props> {
 		params.refreshFolders();
 
 		window.addEventListener('click', this.hideMenu);
+
+		ipcRenderer.on('selected-file', (event, filepath) => {
+			this.pathChange(filepath);
+		});
 	}
 
 	componentWillUnmount () {
@@ -68,11 +80,7 @@ class Upload extends Component<Props> {
 
 	pathChange (newPath) {
 		const { params } = this.props;
-		params.sourceFolder = newPath;
-	}
-
-	folderDialog () {
-		document.getElementById('sourceFolderDialog').click();
+		params.sourceFolder = Array.isArray(newPath) ? newPath[0] : newPath;
 	}
 
 	toggleMenu (e) {
@@ -101,6 +109,7 @@ class Upload extends Component<Props> {
 		function optionFromObj(obj) {
 			return <option key={obj.id} value={obj.id}>{obj.label}</option>
 		}
+
 		function option(str, i) {
 			return <option key={i} value={str}>{str}</option>
 		}
@@ -109,6 +118,7 @@ class Upload extends Component<Props> {
 		const { menu } = this.state;
 		const folders = params.folders.map(optionFromObj);
 		const domains = params.domains.map(option);
+
 		return (
 			<div className="expand">
 				<div className={styles.form}>
@@ -116,25 +126,31 @@ class Upload extends Component<Props> {
 					<div className={styles.field}>
 						<input id="sourceFolder" type="text"
 							onChange={(e) => this.pathChange(e.target.value)}
-							value={params.sourceFolder}
+							value={params.sourceFolder || ''}
 						/>
-						<input id="sourceFolderDialog"
-							type="file"
-							webkitdirectory="true"
-							hidden
-							onChange={(e) => this.pathChange(e.nativeEvent?.target?.files[0]?.path)}
-						/>
+
 						<button type="button"
 							className={ clsx(styles.small, styles.gray) }
-							onClick={() => this.folderDialog() }
-						>{ t('Browse') }</button>
+							onClick={Upload.openFileDialog}
+						>
+							{ t('fileOpenDialog') }
+						</button>
+
+						<button type="button"
+							className={ clsx(styles.small, styles.gray) }
+							onClick={Upload.openFolderDialog}
+						>
+							{ t('folderOpenDialog') }
+						</button>
 					</div>
+
 					<label htmlFor="destFolder">{ t('upload.selectDestFolder') }</label>
 					<div className={styles.field}>
 						<select id="destFolder" onChange={(e) => params.selectFolder(e.currentTarget.value)} >
 							{folders}
 						</select>
 					</div>
+
 					<label htmlFor="domain">{ t('upload.selectDomain') }</label>
 					<div className={styles.field}>
 						<select id="domain" defaultValue={params.origin} onChange={(e) => params.setDomain(e.currentTarget.value)} >

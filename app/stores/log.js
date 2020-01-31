@@ -10,6 +10,12 @@ export default class LogStore {
 
 	@observable uploaded = 0;
 
+	@observable bytesRead = 0;
+
+	@observable speed = 0;
+
+	@observable lastBytesRead = 0;
+
 	constructor({ ipc }) {
 		const $self = this;
 		this.ipc = ipc;
@@ -18,6 +24,8 @@ export default class LogStore {
 		ipc.on('logNewFileWasUploaded', (e, data) => $self.acceptEvent(data));
 		ipc.on('logNewFileUploadStarted', (e, data) => $self.acceptEvent(data));
 		ipc.on('logFileByHashStarted', (e, data) => $self.acceptEvent(data));
+		ipc.on('logUploadProgress', (e, data) => $self.acceptEvent(data));
+		ipc.on('logBytesRead', (e, data) => $self.updateBytesRead(data));
 
 
 		ipc.on('started', (e, flag) => {
@@ -28,6 +36,16 @@ export default class LogStore {
 		ipc.on('stopped', () => {
 			this.setInProgress(false);
 		});
+
+		this.startSpeedCheck();
+	}
+
+	@action
+	startSpeedCheck() {
+		setInterval(() => {
+			this.speed = this.bytesRead - this.lastBytesRead;
+			this.lastBytesRead = this.bytesRead;
+		}, 1000);
 	}
 
 	acceptEvent (data) {
@@ -46,6 +64,11 @@ export default class LogStore {
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	@action
+	updateBytesRead(data) {
+		this.bytesRead += data;
 	}
 
 	@action

@@ -3,11 +3,12 @@ import { inject, observer } from 'mobx-react';
 import { withTranslation } from 'react-i18next';
 import ReactTable from "react-table";
 import clsx from 'clsx';
-
+import filesize from 'filesize';
 import 'react-table/react-table.css';
 import './fix-table.css';
 import styles from './style.styl';
 import Spinner from '../Spinner';
+import { LOCAL_STORAGE_UPLOAD_LOG_COLUMNS_WIDTH_KEY } from '../../constants/localStorage';
 
 type Props = {
 	t: () => string,
@@ -22,19 +23,19 @@ class Upload extends Component<Props> {
 	constructor (props) {
 		super(props)
 		this.state = {
-			reflow: false,
 			copied: false,
+			rehydratedColumns: (() => {
+				const columns = localStorage.getItem(LOCAL_STORAGE_UPLOAD_LOG_COLUMNS_WIDTH_KEY);
+				try {
+					return JSON.parse(columns) || [];
+				} catch {
+					return [];
+				}
+			})(),
 		};
-		this.reflow = this.reflow.bind(this);
+
 		this.copy = this.copy.bind(this);
-	}
-
-	componentDidMount(){
-		window.addEventListener('resize', this.reflow);
-	}
-
-	componentWillUnmount () {
-		window.removeEventListener('resize', this.reflow);
+		this.columnResizeHandler = this.columnResizeHandler.bind(this);
 	}
 
 	copy () {
@@ -49,52 +50,99 @@ class Upload extends Component<Props> {
 		log.copy();
 	}
 
-	reflow () {
-		this.setState({ reflow: true });
-		setTimeout(() => {
-			this.setState({ reflow: false });
-		}, 10);
+	columnResizeHandler(columns: $ReadOnlyArray<{id: number, value: number}>) {
+		const { rehydratedColumns } = this.state;
+		const toHydrate = [...rehydratedColumns];
+		columns.forEach(col => {
+			const index = toHydrate.findIndex(r => r.id === col.id);
+			if (index > -1) {
+				toHydrate[index] = { ...col }
+			} else {
+				toHydrate.push(col);
+			}
+		});
+
+		this.setState({ rehydratedColumns: toHydrate });
+		localStorage.setItem(LOCAL_STORAGE_UPLOAD_LOG_COLUMNS_WIDTH_KEY, JSON.stringify(toHydrate));
+	}
+
+	getColRehydratedWidth(colId) {
+		const { rehydratedColumns } = this.state;
+		if (rehydratedColumns.length === 0) {
+			return;
+		}
+
+		const column = rehydratedColumns.find(col => col.id === colId);
+		if (!column) {
+			return;
+		}
+
+		return column.value;
 	}
 
 	render() {
 		const { t, log } = this.props;
-		const { reflow, copied } = this.state;
+		const { copied } = this.state;
+
 		return (
-			<div className={ clsx('expand', reflow && styles.reflow ) }>
+			<div className={clsx('expand')}>
 				<h3>{ t('upload.log') } — { t('upload.files', { count: log.uploaded }) }{
 					log.inProgress && <Spinner />
 				}</h3>
-				<ReactTable className={ clsx({expand: true, copied}) }
+				<div
+					className={styles.bytesRead}
+				>
+					{t('upload.bytesRead')}: {filesize(log.bytesRead)} {` (${filesize(log.speed)}/s)`}
+				</div>
+				<ReactTable
+					className={clsx({expand: true, copied})}
+					onResizedChange={this.columnResizeHandler}
 					data={log.files.slice()}
 					columns={[
 						{
 							Header: t('log.name'),
 							accessor: 'name',
 							Cell: props => {
-								const { original } = props;
 								return (
 									<span>
-										{original.status === 'uploading' && <Spinner size="18" />}
 										{props.value}
 									</span>
 								)
-							}
+							},
+							width: this.getColRehydratedWidth('name'),
+						},
+						{
+							Header: t('log.progress'),
+							accessor: 'progress',
+							Cell: props => {
+								const { original } = props;
+								return (
+									<div className={styles.progressContainer}>
+										<div className={styles.progressBar} style={{ width: `${Math.ceil(original.progress)}%` }} />
+									</div>
+								);
+							},
+							width: this.getColRehydratedWidth('progress'),
 						},
 						{
 							Header: t('log.size'),
 							accessor: 'size',
+							width: this.getColRehydratedWidth('size'),
 						},
 						{
 							Header: t('log.date'),
 							accessor: 'date',
+							width: this.getColRehydratedWidth('date'),
 						},
 						{
 							Header: t('log.id'),
 							accessor: 'id',
+							width: this.getColRehydratedWidth('id'),
 						},
 						{
 							Header: t('log.link'),
 							accessor: 'link',
+							width: this.getColRehydratedWidth('link'),
 						},
 					]}
 					minRows={30}

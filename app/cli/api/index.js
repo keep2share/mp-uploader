@@ -11,6 +11,7 @@ import {
 class Api {
 	constructor(props = {}) {
 		const { apiUrl, logger, isDebug } = props;
+
 		this.apiUrl = apiUrl;
 		this.logger = logger;
 		this.isDebug = isDebug;
@@ -97,9 +98,11 @@ class Api {
 		const promise = rp(params);
 		this.requests.push(promise);
 		this.log({ uri, body });
-		promise.then((response) => this.log(response.body))
+
+		const self = this;
+		promise.then((response) => self.log(response.body))
 			.catch((err) => {
-				this.logger.logError({ errorMessage: err.message, code: err.code });
+				console.log({ errorMessage: err.message, code: err.code })
 				throw err;
 			});
 		return promise;

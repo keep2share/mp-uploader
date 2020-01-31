@@ -3,13 +3,13 @@ import {
 	app,
 	BrowserWindow,
 	ipcMain,
-	screen,
 	Menu,
 	Tray,
 	nativeImage,
 } from 'electron';
 import runner from './shared/runner'
 import IPCLog from './IPCLog'
+import { sizes } from './constants/common';
 
 global.sharedObject = {
 	isQuiting: false,
@@ -40,17 +40,6 @@ function setTrayMenu (mainWindow) {
 }
 
 export default function runui (AppUpdater) {
-
-	const sizes = {
-		width: 826,
-		home: {
-			height: 600,
-		},
-		upload: {
-			height: 946,
-		}
-	}
-
 	const mainWindow = new BrowserWindow({
 		show: false,
 		width: sizes.width,
@@ -60,15 +49,6 @@ export default function runui (AppUpdater) {
 		},
 	});
 	setTrayMenu (mainWindow);
-
-	ipcMain.on('resize', (event, page) => {
-		const pos = mainWindow.getPosition();
-		const { height } = sizes[page];
-		const screenHeight = screen.getPrimaryDisplay().workAreaSize.height;
-		const top = Math.floor((screenHeight - height)/2);
-		mainWindow.setSize(sizes.width, height, true);
-		mainWindow.setPosition(pos[0], top, true);
-	});
 
 	let uploader;
 
@@ -138,4 +118,5 @@ export default function runui (AppUpdater) {
 	// eslint-disable-next-line
 	new AppUpdater();
 
+	return mainWindow;
 }

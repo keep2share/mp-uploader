@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router';
 import { Redirect } from 'react-router-dom';
@@ -25,10 +24,6 @@ export default class Routes extends Component {
 		return token.apiToken && token.isValid && token.isClean;
 	}
 
-	resize () {
-		ipcRenderer.send('resize', 'upload');
-	}
-
 	render () {
 		return (
 			<App>
@@ -37,9 +32,7 @@ export default class Routes extends Component {
 					<Route path={routes.HOME} exact component={HomePage} >
 						{ this.isRedirect && <Redirect to={routes.UPLOAD} /> }
 					</Route>
-					<Route path={routes.UPLOAD} exact component={UploadPage}>
-						{ this.isRedirect && this.resize() }
-					</Route>
+					<Route path={routes.UPLOAD} exact component={UploadPage} />
 				</Switch>
 			</App>
 		)

@@ -1,8 +1,8 @@
 export default {
 	phpApiHosts: {
 		k2s: {
-			api: 'https://keep2share.cc.local/api/v2',
-			origin: 'https://keep2share.cc.local'
+			api: 'https://k2s.dev.local/api/v2',
+			origin: 'https://k2s.dev.local'
 		},
 		p2m: {
 			api: 'https://publish2.me.local/api/v2',

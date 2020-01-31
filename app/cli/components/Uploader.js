@@ -216,7 +216,7 @@ class Uploader extends EventEmitter {
 					name,
 					size,
 					id: uploadedByHashFile.body.id,
-					link: this.generateLinkForDomain(uploadedByHashFile.body.link),
+					link: this.generateLinkForDomain(uploadedByHashFile.body.link, name),
 					date_created: new Date().toISOString(),
 				});
 				this.onUploadFileEnd();
@@ -230,7 +230,7 @@ class Uploader extends EventEmitter {
 					name,
 					size,
 					id: newFile.user_file_id,
-					link: this.generateLinkForDomain(newFile.link),
+					link: this.generateLinkForDomain(newFile.link, name),
 					date_created: new Date().toISOString(),
 				});
 				this.onUploadFileEnd();
@@ -249,11 +249,15 @@ class Uploader extends EventEmitter {
 		return `${this.state.origin}/file/${id}`;
 	}
 
-	generateLinkForDomain(link) {
+	generateLinkForDomain(link, name = null) {
 		const { hostname } = this.state;
-		return urijs(link)
-			.hostname(hostname)
-			.toString();
+		const domainLink = urijs(link).protocol('http').hostname(hostname).toString();
+
+		if (name) {
+			return `${domainLink}/${name}`;
+		}
+
+		return domainLink;
 	}
 
 	async uploadFolder(currentFile) {
@@ -359,7 +363,16 @@ class Uploader extends EventEmitter {
 				formData[key] = uploadData.body.form_data[key].toString();
 			});
 
-		formData[uploadData.body.file_field] = fs.createReadStream(currentFile.path);
+		const fileStream = fs.createReadStream(currentFile.path);
+		fileStream.on('data', (chunk) => {
+			// eslint-disable-next-line no-param-reassign
+			currentFile.uploadedBytes = currentFile.uploadedBytes ? currentFile.uploadedBytes + chunk.length : chunk.length;
+			// eslint-disable-next-line no-param-reassign
+			currentFile.progress = currentFile.uploadedBytes / parseInt(currentFile.size, 10) * 100;
+			this.logger.logUploadProgress(currentFile);
+			this.logger.logBytesRead(chunk.length);
+		});
+		formData[uploadData.body.file_field] = fileStream;
 		if (!currentFile.isFolder) {
 			this.logger.logNewFileUploadStarted({
 				sha1: currentFile.sha1,

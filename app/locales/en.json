@@ -26,7 +26,8 @@
       "log": "Uploading log",
       "files": "{{count}} file was uploaded",
       "files_plural": "{{count}} files were uploaded",
-      "debugAttention": "Attention! Yau are uploading files in the debug mode. After finish process you can find <1>{{name}}</1> in the same folder where FileUploader is located"
+      "debugAttention": "Attention! Yau are uploading files in the debug mode. After finish process you can find <1>{{name}}</1> in the same folder where FileUploader is located",
+      "bytesRead": "Uploaded"
     },
     "log": {
       "name": "Local file name",
@@ -34,7 +35,10 @@
       "date": "Upload date",
       "id": "File ID",
       "link": "Download link",
-      "noFiles": "No downloaded files"
-    }
+      "noFiles": "No uploaded files",
+      "progress": "Status"
+    },
+    "folderOpenDialog": "Open folder",
+    "fileOpenDialog": "Open file"
   }
 }

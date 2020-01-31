@@ -42,6 +42,14 @@ export default class IPCLog extends Log {
 		}
 		this.ipc.send('logFileByHashStarted', JSON.stringify({...data, status: 'uploading'}));
 	}
+	
+	logUploadProgress(data) {
+		this.ipc.send('logUploadProgress', JSON.stringify({...data, status: 'uploading'}));
+	}
+
+	logBytesRead(data) {
+		this.ipc.send('logBytesRead', data);
+	}
 
 	stopped(data) {
 		if (this.isDebug) {
