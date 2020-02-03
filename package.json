@@ -1,7 +1,7 @@
 {
   "name": "moneyplatform-file-uploader",
   "productName": "Moneyplatform File Uploader",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Purpose is simplify and speed up file uploading by partners before sharing links",
   "author": {
     "name": "Moneyplatform.biz",
@@ -57,7 +57,9 @@
       "stylelint --ignore-path .eslintignore --syntax scss --fix",
       "git add"
     ],
-    "*.{yml,md}": ["git add"]
+    "*.{yml,md}": [
+      "git add"
+    ]
   },
   "main": "./app/main.prod.js",
   "build": {
@@ -86,10 +88,16 @@
       ]
     },
     "win": {
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "linux": {
-      "target": ["deb", "rpm", "AppImage"],
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
       "category": "Work"
     },
     "directories": {
@@ -132,7 +140,10 @@
     "hot",
     "reload"
   ],
-  "files": ["/bin", "/src"],
+  "files": [
+    "/bin",
+    "/src"
+  ],
   "homepage": "https://moneyplatform.biz/",
   "jest": {
     "testURL": "http://localhost/",
@@ -140,11 +151,17 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
-    "moduleFileExtensions": ["js", "jsx", "json"],
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json"
+    ],
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     },
-    "setupFiles": ["./internals/scripts/CheckBuiltsExist.js"]
+    "setupFiles": [
+      "./internals/scripts/CheckBuiltsExist.js"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

@@ -137,7 +137,7 @@ class Upload extends Component<Props> {
 						</button>
 
 						<button type="button"
-							className={ clsx(styles.small, styles.gray) }
+							className={ clsx(styles.small, styles.gray, styles.marginLeft) }
 							onClick={Upload.openFolderDialog}
 						>
 							{ t('folderOpenDialog') }
