@@ -23,11 +23,16 @@ import upload from './cli/commands/upload'
 
 import runui from './ui'
 
+import { setAppMode, CONSOLE_MODE, setAppQuit } from './cli/components/uploaderContext';
+
 ipcMain.on('open-file-dialog', function openFileDialog(event) {
 	dialog.showOpenDialog({
-  	properties: ['openFile']
+		properties: ['openFile', 'multiSelections'],
+		filters: { extensions: ['*']},
 	}, function sendFiles(files) {
-  	if (files) event.sender.send('selected-file', files)
+  	if (files) {
+			event.sender.send('selected-file', { files, type: 'files' })
+		}
 	});
 })
 
@@ -35,7 +40,7 @@ ipcMain.on('open-folder-dialog', function openFolderDialog(event) {
 	dialog.showOpenDialog({
 		properties: ['openDirectory']
 	}, function sendFiles(files) {
-		if (files) event.sender.send('selected-file', files)
+		if (files) event.sender.send('selected-file', { files, type: 'folder' })
 	});
 })
 
@@ -111,8 +116,12 @@ if (!gotTheLock) {
 				cmd = '';
 				argv.unshift('');
 			}
+			setAppMode(CONSOLE_MODE);
+			setAppQuit(app.quit);
 			config.runCommand(cmd, argv.slice(1))
-				.catch(require('@oclif/errors/handle'));
+				.then(require('@oclif/command/flush'))
+				.catch(require('@oclif/errors/handle'))
+
 			return;
 		}
 

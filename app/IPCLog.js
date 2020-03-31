@@ -12,6 +12,7 @@ export default class IPCLog extends Log {
 		if (this.isDebug) {
 			super.logFileAlreadyUploaded(data);
 		}
+
 		this.ipc.send('logFileAlreadyUploaded', JSON.stringify({...data, status: 'ready'}));
 	}
 
@@ -19,6 +20,7 @@ export default class IPCLog extends Log {
 		if (this.isDebug) {
 			super.logFileWasCreatedByHash(data);
 		}
+
 		this.ipc.send('logFileWasCreatedByHash', JSON.stringify({...data, status: 'ready'}));
 	}
 
@@ -42,7 +44,7 @@ export default class IPCLog extends Log {
 		}
 		this.ipc.send('logFileByHashStarted', JSON.stringify({...data, status: 'uploading'}));
 	}
-	
+
 	logUploadProgress(data) {
 		this.ipc.send('logUploadProgress', JSON.stringify({...data, status: 'uploading'}));
 	}

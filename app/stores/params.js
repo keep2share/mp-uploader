@@ -24,6 +24,8 @@ export default class UploadParams {
 
 	@observable origin = this.domains[FIRST];
 
+	@observable filesToUpload = [];
+
 	constructor (token, api) {
 		this.token = token;
 		this.api = api;
@@ -72,4 +74,13 @@ export default class UploadParams {
 		this.selectedFolder = this.folders[FIRST];
 	}
 
+	@action
+	setSource(path) {
+		this.sourceFolder = path;
+	}
+
+	@action
+	setFilesToUpload(filesPaths) {
+		this.filesToUpload = filesPaths;
+	}
 }

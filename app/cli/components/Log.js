@@ -129,6 +129,11 @@ class Log {
 		this.logToCsv(opts);
 	}
 
+	logUploadProgress() {
+	}
+
+	logBytesRead() {
+	}
 }
 
 // TODO classes of messages implements Log { logFileAlreadyUploaded, logFileWasCreatedByHash ....}

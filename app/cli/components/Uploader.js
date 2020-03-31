@@ -5,7 +5,18 @@ import path from 'path'
 import { EventEmitter } from 'events'
 import readChunk from 'read-chunk'
 import urijs from 'urijs'
+import uniqid from 'uniqid';
 import { CHUNK_HASH_SIZE } from '../consts'
+import {
+	getActiveUploaders,
+	removeActiveUploader,
+	addActiveUploader,
+	getAppMode,
+	CONSOLE_MODE,
+	executeAppQuit,
+	UI_MODE,
+	getMainWindow,
+} from './uploaderContext';
 
 class Uploader extends EventEmitter {
 	static getSha1(buffer) {
@@ -42,7 +53,8 @@ class Uploader extends EventEmitter {
 
 	constructor(props) {
 		super();
-
+		this.id = uniqid();
+		addActiveUploader(this.id);
 		const {
 			sourceFolder,
 			destinationFolder,
@@ -51,6 +63,7 @@ class Uploader extends EventEmitter {
 			logger,
 			hostname,
 			origin,
+			filesToUpload = [],
 		} = props;
 
 		this.logger = logger;
@@ -65,6 +78,7 @@ class Uploader extends EventEmitter {
 			origin,
 			uploadsInProcess: 0,
 			currentFileIndex: 0,
+			filesToUpload,
 		};
 
 		this.maxUploadsCount = 5;
@@ -80,22 +94,50 @@ class Uploader extends EventEmitter {
 			}
 		});
 
+		if (getAppMode() === CONSOLE_MODE) {
+			this.on('all-upload-end', () => {
+				executeAppQuit();
+			});
+		}
+
+		if (getAppMode() === UI_MODE) {
+			this.on('all-upload-end', () => {
+				getMainWindow().webContents.send('stopped', 'true');
+			});
+		}
+
 	}
 
 	async getFilesArray() {
-		const { sourceFolder } = this.state;
-		const isFile = await Uploader.isFile(sourceFolder);
-		let files;
-		if (isFile) {
-			files = [path.basename(sourceFolder)];
-			this.state.sourceFolder = path.parse(sourceFolder).dir;
-		} else {
-			const readDirAsync = promisify(fs.readdir);
-			files = await readDirAsync(sourceFolder);
-		}
+		const { sourceFolder, filesToUpload } = this.state;
+		try {
+			const isFile = await Uploader.isFile(sourceFolder);
+			let files;
 
-		this.state.filesArray = files;
-		return files;
+			if (isFile) {
+				files = [path.basename(sourceFolder)];
+				this.state.sourceFolder = path.parse(sourceFolder).dir;
+			} else {
+				const readDirAsync = promisify(fs.readdir);
+				files = await readDirAsync(sourceFolder);
+
+				if (filesToUpload.length) {
+					const MIN_FILENAME_LENGTH = 3;
+					const filteredFilesToUpload = filesToUpload.map(file => path.basename(file))
+						.filter(file => file.length > MIN_FILENAME_LENGTH)
+						.filter(file => files.includes(file));
+
+					files = filteredFilesToUpload;
+				}
+			}
+
+			this.state.filesArray = files;
+			return files;
+		} catch (err) {
+			console.log({ err });
+			this.onUploadFileEnd();
+			return this.logger.logError({ errorMessage: err.message });
+		}
 	}
 
 	async getFilesFromDestinationFolder() {
@@ -144,6 +186,11 @@ class Uploader extends EventEmitter {
 			filesArray,
 		} = this.state;
 
+		if (!filesArray.length) {
+			this.onUploadFileEnd();
+			return
+		}
+
 		const { maxUploadsCount } = this;
 
 		while (this.state.currentFileIndex < filesArray.length) {
@@ -167,11 +214,20 @@ class Uploader extends EventEmitter {
 			filesArray,
 			currentFileIndex,
 		} = this.state;
-		this.decrementUploadInProcessCount();
+
+		if (this.state.uploadsInProcess > 0) {
+			this.decrementUploadInProcessCount();
+		}
 
 		if(currentFileIndex >= filesArray.length && !this.state.uploadsInProcess) {
+			removeActiveUploader(this.id);
+			if (!getActiveUploaders().length) {
+				this.emit('all-upload-end');
+			}
+
 			return this.emit('folder-upload-end');
 		}
+
 		this.massUpload();
 	}
 
@@ -240,6 +296,7 @@ class Uploader extends EventEmitter {
 			this.onUploadFileEnd();
 			return this.logger.logError({ errorMessage: 'empty response from filestore', name: filename });
 		} catch (err) {
+			console.log({ err });
 			this.onUploadFileEnd();
 			return this.logger.logError({ errorMessage: err.message, name: filename });
 		}
@@ -295,6 +352,7 @@ class Uploader extends EventEmitter {
 			uploader.on('folder-upload-end', () => {
 				self.onUploadFileEnd();
 			});
+
 			self.on('stop', () => {
 				uploader.emit('stop');
 			});

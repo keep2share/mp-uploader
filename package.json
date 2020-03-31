@@ -1,7 +1,7 @@
 {
   "name": "moneyplatform-file-uploader",
   "productName": "Moneyplatform File Uploader",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Purpose is simplify and speed up file uploading by partners before sharing links",
   "author": {
     "name": "Moneyplatform.biz",
@@ -285,6 +285,7 @@
     "source-map-support": "^0.5.13",
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.2",
+    "uniqid": "^5.2.0",
     "urijs": "^1.19.1"
   },
   "devEngines": {

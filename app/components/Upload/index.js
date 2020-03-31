@@ -50,8 +50,8 @@ class Upload extends Component<Props> {
 
 		window.addEventListener('click', this.hideMenu);
 
-		ipcRenderer.on('selected-file', (event, filepath) => {
-			this.pathChange(filepath);
+		ipcRenderer.on('selected-file', (event, { files: filepath, type }) => {
+			this.pathChange(filepath, type);
 		});
 	}
 
@@ -61,7 +61,7 @@ class Upload extends Component<Props> {
 
 	start () {
 		const { params, token, log } = this.props;
-		const { sourceFolder, destinationFolder } = params;
+		const { sourceFolder, destinationFolder, filesToUpload } = params;
 
 		sharedObject.uploadParams = {
 			accessToken: token.apiToken,
@@ -69,6 +69,7 @@ class Upload extends Component<Props> {
 			destinationFolder,
 			origin: params.origin,
 			isDebug: log.isDebug,
+			filesToUpload,
 		};
 		log.setInProgress(true);
 		ipcRenderer.send('start');
@@ -78,9 +79,35 @@ class Upload extends Component<Props> {
 		ipcRenderer.send('stop');
 	}
 
-	pathChange (newPath) {
+	pathChange (newPath, type) {
 		const { params } = this.props;
-		params.sourceFolder = Array.isArray(newPath) ? newPath[0] : newPath;
+		switch(type) {
+		/* eslint-disable indent */
+			case 'folder': {
+				params.setSource(newPath[0]);
+				params.setFilesToUpload([]);
+				break;
+			}
+
+			case 'files': {
+				if (newPath.length === 1) {
+					params.setSource(newPath[0]);
+					params.setFilesToUpload([]);
+					break;
+				}
+
+				const folderPath = (newPath.length && path.dirname(newPath[0])) || "";
+				params.setSource(folderPath);
+				params.setFilesToUpload(newPath);
+				break;
+			}
+
+			default: {
+				params.setSource(newPath);
+				params.setFilesToUpload([]);
+			}
+		}
+		/* eslint-enable indent */
 	}
 
 	toggleMenu (e) {
@@ -143,6 +170,15 @@ class Upload extends Component<Props> {
 							{ t('folderOpenDialog') }
 						</button>
 					</div>
+
+					{params.filesToUpload.length !== 0 && (
+						<>
+							<div className={styles.field}>Files to upload: </div>
+							<ul className={styles.filesToUpload}>
+								{params.filesToUpload.map(file => <li key={file}>{file}</li>)}
+							</ul>
+						</>
+					)}
 
 					<label htmlFor="destFolder">{ t('upload.selectDestFolder') }</label>
 					<div className={styles.field}>

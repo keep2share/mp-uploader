@@ -21,6 +21,7 @@ export default class LogStore {
 		this.ipc = ipc;
 
 		ipc.on('logFileWasCreatedByHash', (e, data) => $self.acceptEvent(data));
+		ipc.on('logFileAlreadyUploaded', (e, data) => $self.acceptEvent(data));
 		ipc.on('logNewFileWasUploaded', (e, data) => $self.acceptEvent(data));
 		ipc.on('logNewFileUploadStarted', (e, data) => $self.acceptEvent(data));
 		ipc.on('logFileByHashStarted', (e, data) => $self.acceptEvent(data));
@@ -54,7 +55,7 @@ export default class LogStore {
 		}
 		try {
 			const eventFile = JSON.parse(data);
-			const existing = this.files.find(file => file.id && file.id === eventFile.id || file.sha1 === eventFile.sha1);
+			const existing = this.files.find(file => file.id && file.id === eventFile.id || file.name === eventFile.name);
 			eventFile.size /= 1000000;
 			if (existing) {
 				this.update(existing, eventFile);

@@ -10,6 +10,7 @@ import {
 import runner from './shared/runner'
 import IPCLog from './IPCLog'
 import { sizes } from './constants/common';
+import { setMainWindow } from  './cli/components/uploaderContext';
 
 global.sharedObject = {
 	isQuiting: false,
@@ -59,12 +60,14 @@ export default function runui (AppUpdater) {
 			destinationFolder,
 			origin,
 			isDebug,
+			filesToUpload,
 		} = sharedObject.uploadParams;
 		const pathToCsv = path.join(path.dirname(process.argv0), 'debug-mode.log');
 		const stdoutJson = isDebug;
 		const ipc = mainWindow.webContents;
 		const logger = new IPCLog({ pathToCsv, stdoutJson, origin, ipc, isDebug });
 		try {
+			setMainWindow(mainWindow);
 			uploader = await runner({
 				apiUrl: `${origin}/api/v2`,
 				sourceFolder,
@@ -73,10 +76,13 @@ export default function runui (AppUpdater) {
 				origin,
 				logger,
 				isDebug,
+				filesToUpload
 			})
+
 			uploader.on('folder-upload-end', () => {
 				mainWindow.webContents.send('stopped', 'true');
 			});
+
 			mainWindow.webContents.send('started', 'true');
 		} catch (err) {
 			mainWindow.webContents.send('started', 'false');
