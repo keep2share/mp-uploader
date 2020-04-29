@@ -6,6 +6,7 @@ import {
 	FILE_ACCESS_PUBLIC,
 	DEFAULT_REQUEST_PER_SECOND,
 	CLI_CREATE_METHOD_FOR_PHP_API,
+	CLI_CREATE_BY_HASH_METHOD_FOR_PHP_API,
 } from '../consts'
 
 class Api {
@@ -156,6 +157,7 @@ class Api {
 			access,
 			name,
 			access_token: accessToken,
+			create_method: CLI_CREATE_BY_HASH_METHOD_FOR_PHP_API,
 		});
 	}
 
