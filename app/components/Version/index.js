@@ -12,9 +12,9 @@ export default class Version extends Component<Props> {
 	props: Props;
 
 	render() {
-		const { meta } = this.props;
-		return (
-			<span>{ meta.version }</span>
-		);
+	  const { meta } = this.props;
+	  return (
+	    <span>{ meta.version }</span>
+	  );
 	}
 }

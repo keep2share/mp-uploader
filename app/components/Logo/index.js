@@ -13,13 +13,13 @@ export default class Version extends Component<Props> {
 	props: Props;
 
 	render() {
-		const { logo, big, left } = styles;
-		const { big: isBig } = this.props;
-		return (
-			<div className={ clsx(logo, isBig ? big : left ) } >
-				<img src={logotype} alt="Logo" />
-				<h2>File uploader</h2>
-			</div>
-		);
+	  const { logo, big, left } = styles;
+	  const { big: isBig } = this.props;
+	  return (
+	    <div className={ clsx(logo, isBig ? big : left ) } >
+	      <img src={logotype} alt="Logo" />
+	      <h2>File uploader</h2>
+	    </div>
+	  );
 	}
 }

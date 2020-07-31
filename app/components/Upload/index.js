@@ -5,7 +5,8 @@ import { inject, observer } from 'mobx-react';
 import { Trans, withTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import path from 'path'
-import Log from './Log';
+import { IconPlus1, IconMinus1 } from './icons';
+import Log from '../../containers/Log';
 import styles from './style.styl';
 
 type Props = {
@@ -25,64 +26,67 @@ class Upload extends Component<Props> {
 	props: Props;
 
 	static openFileDialog() {
-		ipcRenderer.send('open-file-dialog');
+	  ipcRenderer.send('open-file-dialog');
 	}
 
 	static openFolderDialog() {
-		ipcRenderer.send('open-folder-dialog');
+	  ipcRenderer.send('open-folder-dialog');
 	}
 
 	constructor (props) {
-		super(props)
-		this.state = {
-			menu: false,
-		};
+	  super(props)
+	  this.state = {
+	    menu: false,
+	  };
 
-		this.hideMenu = this.hideMenu.bind(this);
-		this.toggleMenu = this.toggleMenu.bind(this);
-		this.openLog = this.openLog.bind(this);
+	  this.hideMenu = this.hideMenu.bind(this);
+	  this.toggleMenu = this.toggleMenu.bind(this);
+	  this.openLog = this.openLog.bind(this);
+	  this.threadsChangeHandler = this.threadsChangeHandler.bind(this);
 	}
 
 	componentDidMount () {
-		const { params } = this.props;
-		params.refreshDomains();
-		params.refreshFolders();
+	  const { params } = this.props;
+	  params.refreshDomains();
+	  params.refreshFolders();
 
-		window.addEventListener('click', this.hideMenu);
+	  window.addEventListener('click', this.hideMenu);
 
-		ipcRenderer.on('selected-file', (event, { files: filepath, type }) => {
-			this.pathChange(filepath, type);
-		});
+	  ipcRenderer.on('selected-file', (event, { files: filepath, type }) => {
+	    this.pathChange(filepath, type);
+	  });
 	}
 
 	componentWillUnmount () {
-		window.removeEventListener('click', this.hideMenu);
+	  window.removeEventListener('click', this.hideMenu);
 	}
 
 	start () {
-		const { params, token, log } = this.props;
-		const { sourceFolder, destinationFolder, filesToUpload } = params;
+	  const { params, token, log } = this.props;
+	  const { sourceFolder, destinationFolder, filesToUpload } = params;
 
-		sharedObject.uploadParams = {
-			accessToken: token.apiToken,
-			sourceFolder,
-			destinationFolder,
-			origin: params.origin,
-			isDebug: log.isDebug,
-			filesToUpload,
-		};
-		log.setInProgress(true);
-		ipcRenderer.send('start');
+	  sharedObject.uploadParams = {
+	    accessToken: token.apiToken,
+	    sourceFolder,
+	    destinationFolder,
+	    origin: params.origin,
+	    isDebug: log.isDebug,
+	    filesToUpload,
+	    threadsCount: params.threadsCount || 5,
+	  };
+
+	  log.setInProgress(true);
+	  ipcRenderer.send('start');
 	}
 
 	stop () {
-		ipcRenderer.send('stop');
+	  ipcRenderer.send('stop');
 	}
 
 	pathChange (newPath, type) {
-		const { params } = this.props;
-		switch(type) {
-		/* eslint-disable indent */
+	  const { params } = this.props;
+	  switch(type) {
+	  /* eslint-disable indent */
 			case 'folder': {
 				params.setSource(newPath[0]);
 				params.setFilesToUpload([]);
@@ -111,119 +115,173 @@ class Upload extends Component<Props> {
 	}
 
 	toggleMenu (e) {
-		const { menu } = this.state;
-		this.setState((previousState) => {
-			return { ...previousState, menu: !menu };
-		});
-		e.stopPropagation();
+	  const { menu } = this.state;
+	  this.setState((previousState) => {
+	    return { ...previousState, menu: !menu };
+	  });
+	  e.stopPropagation();
 	}
 
 	hideMenu () {
-		this.setState({ menu: false });
+	  this.setState({ menu: false });
 	}
 
 	setDebug (f) {
-		const { log } = this.props;
-		log.setDebug(f);
-		this.start();
+	  const { log } = this.props;
+	  log.setDebug(f);
+	  this.start();
 	}
 
 	openLog () {
-		shell.openExternal(path.join(path.dirname(process.argv0), debugLogFilename));
+	  shell.openExternal(path.join(path.dirname(process.argv0), debugLogFilename));
+	}
+
+	threadsChangeHandler(val) {
+	  const { params: { setThreadsCount, threadsCount } } = this.props;
+	  const newCount = threadsCount + val;
+	  if (newCount > 5) {
+	    setThreadsCount(5);
+	  } else if (newCount < 1) {
+	    setThreadsCount(1);
+	  } else {
+	    setThreadsCount(newCount);
+	  }
 	}
 
 	render() {
-		function optionFromObj(obj) {
-			return <option key={obj.id} value={obj.id}>{obj.label}</option>
-		}
+	  function optionFromObj(obj) {
+	    return <option key={obj.id} value={obj.id}>{obj.label}</option>
+	  }
 
-		function option(str, i) {
-			return <option key={i} value={str}>{str}</option>
-		}
+	  function option(str, i) {
+	    return <option key={i} value={str}>{str}</option>
+	  }
 
-		const { t, params, log } = this.props;
-		const { menu } = this.state;
-		const folders = params.folders.map(optionFromObj);
-		const domains = params.domains.map(option);
+	  const { t, params, log } = this.props;
+	  const { menu } = this.state;
+	  const folders = params.folders.map(optionFromObj);
+	  const domains = params.domains.map(option);
 
-		return (
-			<div className="expand">
-				<div className={styles.form}>
-					<label htmlFor="sourceFolder">{ t('upload.selectSourceFolder') }</label>
-					<div className={styles.field}>
-						<input id="sourceFolder" type="text"
-							onChange={(e) => this.pathChange(e.target.value)}
-							value={params.sourceFolder || ''}
-						/>
+	  const { threadsCount } = params;
 
-						<button type="button"
-							className={ clsx(styles.small, styles.gray) }
-							onClick={Upload.openFileDialog}
-						>
-							{ t('fileOpenDialog') }
-						</button>
+	  return (
+	    <div className="expand">
+	      <div className={styles.form}>
+	        <div className={styles.container}>
+	          <div className={styles.uploadPath}>
+	            <label htmlFor="sourceFolder">{ t('upload.selectSourceFolder') }</label>
+	            <div className={styles.field}>
+	              <input id="sourceFolder" type="text"
+	                onChange={(e) => this.pathChange(e.target.value)}
+	                value={params.sourceFolder || ''}
+	              />
 
-						<button type="button"
-							className={ clsx(styles.small, styles.gray, styles.marginLeft) }
-							onClick={Upload.openFolderDialog}
-						>
-							{ t('folderOpenDialog') }
-						</button>
-					</div>
+	              <button type="button"
+	                className={ clsx(styles.small, styles.gray) }
+	                onClick={Upload.openFileDialog}
+	              >
+	                { t('fileOpenDialog') }
+	              </button>
 
-					{params.filesToUpload.length !== 0 && (
-						<>
-							<div className={styles.field}>Files to upload: </div>
-							<ul className={styles.filesToUpload}>
-								{params.filesToUpload.map(file => <li key={file}>{file}</li>)}
-							</ul>
-						</>
-					)}
+	              <button type="button"
+	                className={ clsx(styles.small, styles.gray, styles.marginLeft) }
+	                onClick={Upload.openFolderDialog}
+	              >
+	                { t('folderOpenDialog') }
+	              </button>
+	            </div>
+	          </div>
 
-					<label htmlFor="destFolder">{ t('upload.selectDestFolder') }</label>
-					<div className={styles.field}>
-						<select id="destFolder" onChange={(e) => params.selectFolder(e.currentTarget.value)} >
-							{folders}
-						</select>
-					</div>
+	          <div className={styles.uploadSettings}>
+	            <label htmlFor="uploadsCount">{ t('upload.uploadsCount') }</label>
+	            <div className={styles.field}>
+	              <span
+	                className={styles.threadsCount}
+	                name="uploadsCount"
+	              >
+	                {threadsCount}
+	              </span>
 
-					<label htmlFor="domain">{ t('upload.selectDomain') }</label>
-					<div className={styles.field}>
-						<select id="domain" defaultValue={params.origin} onChange={(e) => params.setDomain(e.currentTarget.value)} >
-							{domains}
-						</select>
-					</div>
-					<div style={{ display: 'flex' }}>
-						<button type="button"
-							onClick={() => this.start()}
-							disabled={log.inProgress}
-						>{ t('upload.start') }</button>
-						<button type="button"
-							className={styles.debug}
-							disabled={log.inProgress}
-							onClick={this.toggleMenu}>&#x25BE;</button>
-						{ menu && <ul className="menu">
-							<li><button type="button" onClick={() => this.setDebug(false)}>{ t('upload.start') }</button></li>
-							<li><button type="button" onClick={() => this.setDebug(true)}>{ t('upload.startDebug') }</button></li>
-						</ul> }
-						<button type="button"
-							className={ clsx(styles.yellow, 'right') }
-							onClick={() => this.stop()}
-							disabled={!log.inProgress}
-						>{ t('upload.stop') }</button>
-					</div>
-				</div>
-				<Log />
-				{ log.isDebug &&
+	              <button
+	                type="button"
+	                className={styles.increaseButton}
+	                onClick={() => this.threadsChangeHandler(1)}
+	              >
+	                <span className={styles.iconBox}>
+	                  <IconPlus1 />
+	                </span>
+	              </button>
+
+	              <button
+	                type="button"
+	                className={styles.decreaseButton}
+	                onClick={() => this.threadsChangeHandler(-1)}
+	              >
+	                <span className={styles.iconBox}>
+	                  <IconMinus1 />
+	                </span>
+	              </button>
+	            </div>
+	          </div>
+	        </div>
+
+	        {params.filesToUpload && params.filesToUpload.length !== 0 && (
+	          <>
+	            <div className={styles.field}>Files to upload ({params.filesToUpload.length}): </div>
+	            <ul className={styles.filesToUpload}>
+	              {params.filesToUpload.map(file => <li key={file}>{file}</li>)}
+	            </ul>
+	          </>
+	        )}
+
+	        <div className={styles.shortWidth}>
+	          <label htmlFor="destFolder">{ t('upload.selectDestFolder') }</label>
+	          <div className={styles.field}>
+	            <select id="destFolder" onChange={(e) => params.selectFolder(e.currentTarget.value)} >
+	              {folders}
+	            </select>
+	          </div>
+
+	          <label htmlFor="domain">{ t('upload.selectDomain') }</label>
+	          <div className={styles.field}>
+	            <select id="domain" defaultValue={params.origin} onChange={(e) => params.setDomain(e.currentTarget.value)} >
+	              {domains}
+	            </select>
+	          </div>
+	          <div style={{ display: 'flex' }}>
+	            <button type="button"
+	              onClick={() => this.start()}
+	              disabled={log.inProgress}
+	            >{ t('upload.start') }</button>
+	            <button type="button"
+	              className={styles.debug}
+	              disabled={log.inProgress}
+	              onClick={this.toggleMenu}>&#x25BE;</button>
+	            { menu && <ul className="menu">
+	              <li><button type="button" onClick={() => this.setDebug(false)}>{ t('upload.start') }</button></li>
+	              <li><button type="button" onClick={() => this.setDebug(true)}>{ t('upload.startDebug') }</button></li>
+	            </ul> }
+	            <button type="button"
+	              className={ clsx(styles.yellow, 'right') }
+	              onClick={() => this.stop()}
+	              disabled={!log.inProgress}
+	            >{ t('upload.stop') }</button>
+	          </div>
+	        </div>
+	      </div>
+
+
+	      <Log />
+	      { log.isDebug &&
 				<p style={{color: 'red'}}>
-					<Trans i18nKey="upload.debugAttention">
+				  <Trans i18nKey="upload.debugAttention">
 						Attention! Yau are uploading files in the debug mode. After finish process you can find
-						<a href="#" onClick={this.openLog}>{{name: debugLogFilename}}</a>
+				    <a href="#" onClick={this.openLog}>{{name: debugLogFilename}}</a>
 						in the same folder where FileUploader is located
-					</Trans>
+				  </Trans>
 				</p>}
-			</div>
-		);
+	    </div>
+	  );
 	}
 }
 

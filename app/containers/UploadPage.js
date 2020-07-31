@@ -8,6 +8,6 @@ export default class HomePage extends Component<Props> {
 	props: Props;
 
 	render() {
-		return <Upload />
+	  return <Upload />
 	}
 }

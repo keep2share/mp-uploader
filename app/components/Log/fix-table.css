@@ -1,0 +1,46 @@
+.ReactTable {
+	border: solid 1px #DDD;
+}
+
+.ReactTable .rt-thead.-header {
+	box-shadow: none;
+	background: #F8F8F8;
+	border-bottom: solid 1px #DDD;
+}
+
+.ReactTable .rt-thead .rt-th, .ReactTable .rt-thead .rt-td {
+	padding: 11px;
+	border-right: solid 1px #DDD;
+}
+
+.ReactTable .rt-thead .rt-tr {
+	color: #707070;
+	text-align: left;
+	font-weight: 600;
+}
+
+.ReactTable .rt-thead.-header,
+.ReactTable .rt-tbody {
+	overflow-y: scroll;
+}
+
+.ReactTable .rt-tbody .rt-tr-group {
+	border-bottom: solid 1px #DDD;
+}
+
+.ReactTable .rt-tbody .rt-td {
+	border-right: 1px solid #DDD;
+}
+
+.ReactTable.copied .rt-tbody .rt-td:last-child {
+	animation: highlight 0.8s ease-out;
+}
+
+@keyframes highlight {
+	0% {
+		background: #F9DF94;
+	}
+	100% {
+		background: #FFF;
+	}
+}

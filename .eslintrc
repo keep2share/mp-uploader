@@ -23,7 +23,7 @@
     "comma-dangle": "off",
     "indent": [
       "error",
-      "tab",
+      2,
       {
         "flatTernaryExpressions": true
       }

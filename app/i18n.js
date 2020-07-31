@@ -4,18 +4,18 @@ import en from './locales/en.json';
 import ru from './locales/ru.json';
 
 i18n
-	.use(initReactI18next)
-	.init({
-		resources: {
-			en,
-			ru,
-		},
-		lng: 'en',
-		fallbackLng: 'en',
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en,
+      ru,
+    },
+    lng: 'en',
+    fallbackLng: 'en',
 
-		interpolation: {
-			escapeValue: false
-		}
-	});
+    interpolation: {
+      escapeValue: false
+    }
+  });
 
 export default i18n;

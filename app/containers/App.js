@@ -15,29 +15,29 @@ export default class App extends React.Component<Props> {
 	props: Props;
 
 	componentDidMount() {
-		const mainWindow = remote.getCurrentWindow();
-		mainWindow.on('resize', () => {
-			localStorage.setItem(LOCAL_STORAGE_WINDOW_BOUNDS_KEY, JSON.stringify(mainWindow.getBounds()));
-		});
+	  const mainWindow = remote.getCurrentWindow();
+	  mainWindow.on('resize', () => {
+	    localStorage.setItem(LOCAL_STORAGE_WINDOW_BOUNDS_KEY, JSON.stringify(mainWindow.getBounds()));
+	  });
 
-		const hydratedBounds = localStorage.getItem(LOCAL_STORAGE_WINDOW_BOUNDS_KEY);
-		if (hydratedBounds) {
-			try {
-				mainWindow.setBounds(JSON.parse(hydratedBounds));
-			} catch (err) {
-				return false;
-			}
-		}
+	  const hydratedBounds = localStorage.getItem(LOCAL_STORAGE_WINDOW_BOUNDS_KEY);
+	  if (hydratedBounds) {
+	    try {
+	      mainWindow.setBounds(JSON.parse(hydratedBounds));
+	    } catch (err) {
+	      return false;
+	    }
+	  }
 
-		const hydratedLanguage = localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY);
-		if (hydratedLanguage) {
-			const { lang } = this.props;
-			lang.switchTo(hydratedLanguage);
-		}
+	  const hydratedLanguage = localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY);
+	  if (hydratedLanguage) {
+	    const { lang } = this.props;
+	    lang.switchTo(hydratedLanguage);
+	  }
 	}
 
 	render() {
-		const { children } = this.props;
-		return <>{children}</>;
+	  const { children } = this.props;
+	  return <>{children}</>;
 	}
 }

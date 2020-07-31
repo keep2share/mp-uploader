@@ -9,21 +9,21 @@ import './i18n';
 const h = createHashHistory();
 
 render(
-	<AppContainer>
-		<Root history={h} />
-	</AppContainer>,
-	document.getElementById('root')
+  <AppContainer>
+    <Root history={h} />
+  </AppContainer>,
+  document.getElementById('root')
 );
 
 if (module.hot) {
-	module.hot.accept('./containers/Root', () => {
-		// eslint-disable-next-line global-require
-		const NextRoot = require('./containers/Root').default;
-		render(
-			<AppContainer>
-				<NextRoot history={h} />
-			</AppContainer>,
-			document.getElementById('root')
-		);
-	});
+  module.hot.accept('./containers/Root', () => {
+    // eslint-disable-next-line global-require
+    const NextRoot = require('./containers/Root').default;
+    render(
+      <AppContainer>
+        <NextRoot history={h} />
+      </AppContainer>,
+      document.getElementById('root')
+    );
+  });
 }

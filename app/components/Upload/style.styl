@@ -1,7 +1,11 @@
+.container
+	display flex
+	justify-content space-between
+
 .form
 	color #878787
 	font-weight bold
-	width 453px
+	width 100%
 
 	input[type="text"],
 	select
@@ -26,9 +30,24 @@
 		overflow hidden
 		overflow-y auto
 
+.uploadSettings
+	background white
+	padding-right 50px
+
+.threadsCount
+	width: 60px;
+	height: 28px;
+	display: flex;
+	align-self: center;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid #d5d5d5;
 
 .gray
 	background #ACBAC1
+
+.darkgray
+	background #4e5456
 
 .yellow
 	background #F9DF94
@@ -62,3 +81,30 @@
 .marginLeft
 	margin-left 5px
 
+.shortWidth
+	width 460px
+
+.iconBox
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-white);
+	border-radius: var(--border-radius-md);
+	border: 2px solid transparent;
+	font-size: 1.6em;
+
+.increaseButton
+.decreaseButton
+	cursor pointer
+	margin-right 1px
+	background #3D83BE
+	&:hover
+		background #72aada
+	width 60px
+	height 28px
+	padding 0
+	&:focus
+		outline none
+
+.uploadPath
+	flex-basis 460px
