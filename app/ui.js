@@ -99,6 +99,7 @@ export default function runui (AppUpdater) {
     if (!uploader) {
       return;
     }
+
     uploader.emit('stop');
     uploader.api.stop();
     mainWindow.webContents.send('stopped', 'true');

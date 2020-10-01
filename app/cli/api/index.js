@@ -33,7 +33,7 @@ class Api {
     this.requests = [];
   }
 
-  stop () {
+  stop() {
     this.requests.forEach((request) => {
       const { uri, body } = request;
       this.log({
@@ -41,11 +41,12 @@ class Api {
         body,
         status: 'canceled',
       });
+
       request.cancel();
     });
   }
 
-  getRequestsPerSecond () {
+  getRequestsPerSecond() {
     return this.promiseThrottle.requestsPerSecond;
   }
 
@@ -75,7 +76,7 @@ class Api {
     return this.promiseThrottle.add(this.phpApiRequest.bind(this, method, endpoint, body)) ;
   }
 
-  log (opts) {
+  log(opts) {
     if (this.isDebug) {
       this.logger.selLogs(opts);
       this.logger.whriteLog();

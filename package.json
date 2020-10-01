@@ -1,7 +1,7 @@
 {
   "name": "moneyplatform-file-uploader",
   "productName": "Moneyplatform File Uploader",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Purpose is simplify and speed up file uploading by partners before sharing links",
   "author": {
     "name": "Moneyplatform.biz",
@@ -14,7 +14,7 @@
     "build-e2e": "cross-env E2E_BUILD=true yarn build",
     "build-main": "cross-env NODE_ENV=production webpack --config ./configs/webpack.config.main.prod.babel.js --colors",
     "build-renderer": "cross-env NODE_ENV=production webpack --config ./configs/webpack.config.renderer.prod.babel.js --colors",
-    "dev": "cross-env START_HOT=1 node -r @babel/register ./internals/scripts/CheckPortInUse.js && cross-env START_HOT=1 yarn start-renderer-dev",
+    "dev": "cross-env START_HOT=1 NODE_ENV=development node -r @babel/register ./internals/scripts/CheckPortInUse.js && cross-env START_HOT=1 yarn start-renderer-dev",
     "inspect": "cross-env START_HOT=1 node -r @babel/register ./internals/scripts/CheckPortInUse.js && cross-env START_HOT=1 INSPECT=1 yarn start-renderer-dev",
     "flow": "flow",
     "flow-typed": "rimraf flow-typed/npm && flow-typed update",

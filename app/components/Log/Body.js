@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import ReactTable from "react-table";
 import PropTypes from 'prop-types';
@@ -9,7 +10,7 @@ import styles from './body.styl';
 
 const propTypes = ({
   columnResizeHandler: PropTypes.func.isRequired,
-  files: PropTypes.arrayOf(PropTypes.shape),
+  files: PropTypes.arrayOf(PropTypes.shape).isRequired,
   copied: PropTypes.bool.isRequired,
   getColRehydratedWidth: PropTypes.func.isRequired,
   t: PropTypes.func.isRequired,
@@ -26,9 +27,10 @@ function Body({ columnResizeHandler, files, copied, getColRehydratedWidth, t }) 
           Header: t('log.name'),
           accessor: 'name',
           Cell: props => {
+            const { value } = props;
             return (
               <span>
-                {props.value}
+                {value}
               </span>
             )
           },

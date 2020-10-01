@@ -19,7 +19,7 @@ const propTypes = ({
     speed: PropTypes.number,
     clear: PropTypes.func.isRequired,
   }).isRequired,
-})
+});
 
 @inject('log')
 @observer
@@ -28,7 +28,7 @@ class Log extends Component {
     super(props);
 
     this.state = {
-		  copied: false,
+      copied: false,
       rehydratedColumns: (() => {
         const columns = localStorage.getItem(LOCAL_STORAGE_UPLOAD_LOG_COLUMNS_WIDTH_KEY);
         try {

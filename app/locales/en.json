@@ -28,7 +28,8 @@
       "files_plural": "{{count}} files were uploaded",
       "debugAttention": "Attention! Yau are uploading files in the debug mode. After finish process you can find <1>{{name}}</1> in the same folder where FileUploader is located",
       "bytesRead": "Uploaded",
-      "uploadsCount": "Number of upload threads (max 5)"
+      "uploadsCount": "Number of upload threads (max 5)",
+      "aborting": "Aborting..."
     },
     "log": {
       "name": "Local file name",

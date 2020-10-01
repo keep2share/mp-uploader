@@ -6,10 +6,10 @@ import styles from './header.styl';
 import Spinner from '../Spinner';
 
 const propTypes = ({
-  uploadedCount: PropTypes.number,
-  uploadInProgress: PropTypes.bool,
-  bytesRead: PropTypes.number,
-  speed: PropTypes.number,
+  uploadedCount: PropTypes.number.isRequired,
+  uploadInProgress: PropTypes.bool.isRequired,
+  bytesRead: PropTypes.number.isRequired,
+  speed: PropTypes.number.isRequired,
   t: PropTypes.func.isRequired,
 })
 

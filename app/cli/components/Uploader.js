@@ -81,10 +81,12 @@ class Uploader extends EventEmitter {
       currentFileIndex: 0,
       filesToUpload,
       threadsCount,
+      streams: [],
     };
 
     this.maxUploadsCount = threadsCount;
     this.massUpload = this.massUpload.bind(this);
+
     this.on('stop', () => {
       const { state } = this;
       state.currentFileIndex = Number.MAX_SAFE_INTEGER;
@@ -94,6 +96,9 @@ class Uploader extends EventEmitter {
           sourceFolder: this.sourceFolder,
         });
       }
+
+      this.state.streams.forEach(stream => !stream.closed && stream.close());
+      this.state.streams = [];
     });
 
     if (getAppMode() === CONSOLE_MODE) {
@@ -424,6 +429,8 @@ class Uploader extends EventEmitter {
       });
 
     const fileStream = fs.createReadStream(currentFile.path);
+    this.state.streams.push(fileStream);
+
     fileStream.on('data', (chunk) => {
       // eslint-disable-next-line no-param-reassign
       currentFile.uploadedBytes = currentFile.uploadedBytes ? currentFile.uploadedBytes + chunk.length : chunk.length;
@@ -432,6 +439,7 @@ class Uploader extends EventEmitter {
       this.logger.logUploadProgress(currentFile);
       this.logger.logBytesRead(chunk.length);
     });
+
     formData[uploadData.body.file_field] = fileStream;
     if (!currentFile.isFolder) {
       this.logger.logNewFileUploadStarted({

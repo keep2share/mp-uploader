@@ -15,6 +15,7 @@ import {
   TokenStore,
   UploadParams,
   LogStore,
+  createStoresContext,
 } from '../stores';
 
 const hydrate = create();
@@ -28,6 +29,7 @@ const log = new LogStore({ ipc: ipcRenderer });
 const token = new TokenStore(api);
 const params = new UploadParams(token, api);
 
+
 hydrate('params', params);
 
 const stores = {
@@ -39,6 +41,7 @@ const stores = {
   log,
 };
 
+createStoresContext(stores);
 const syncHistory = syncHistoryWithStore(browserHistory, routing);
 
 window.sharedObject = remote.getGlobal('sharedObject');
@@ -51,7 +54,7 @@ window.addEventListener('beforeunload', (e) => {
   }
 });
 
-export default class Root extends Component<Props> {
+export default class Root extends Component {
   render() {
     return (
       <Provider {...stores}>

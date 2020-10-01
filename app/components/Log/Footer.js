@@ -11,6 +11,10 @@ const propTypes = ({
   t: PropTypes.func.isRequired,
 });
 
+const defaultProp = {
+  uploadInProgress: false,
+}
+
 function Footer(props) {
   const { copyHandler, uploadInProgress, clearHandler, t } = props;
 
@@ -37,5 +41,6 @@ function Footer(props) {
 
 Footer.displayName = 'Footer';
 Footer.propTypes = propTypes;
+Footer.defaultProps = defaultProp;
 
 export default withTranslation()(Footer);

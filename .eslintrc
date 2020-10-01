@@ -94,7 +94,7 @@
     {
       "files": ["app/main.dev.js", "app/ui.js"],
       "env": {
-        "browser": false
+        "browser": false,
       }
     }
   ]
