@@ -40,6 +40,10 @@
       "noFiles": "No uploaded files",
       "progress": "Status"
     },
+    "errorsList": {
+      "uploadFailed": "Upload failed",
+      "clearErrors": "Close"
+    },
     "folderOpenDialog": "Open folder",
     "fileOpenDialog": "Open file"
   }

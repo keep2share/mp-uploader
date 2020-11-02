@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import Log from '../../containers/Log';
 import { IconPlus1, IconMinus1 } from './icons';
 import styles from './style.styl';
+import Errors from '../../containers/Errors';
 
 const propTypes = {
   t: PropTypes.func.isRequired,
@@ -176,7 +177,7 @@ function Upload({
         </div>
       </div>
 
-
+      <Errors />
       <Log />
       { log.isDebug &&
 			<p style={{color: 'red'}}>

@@ -39,6 +39,10 @@
       "noFiles": "Нет загруженных файлов",
       "progress": "Статус"
     },
+    "errorsList": {
+      "uploadFailed": "Ошибки загрузки",
+      "clearErrors": "Закрыть"
+    },
     "Enter": "Вход",
     "Browse": "Открыть",
     "folderOpenDialog": "Выбрать папку",

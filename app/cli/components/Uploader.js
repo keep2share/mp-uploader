@@ -17,6 +17,7 @@ import {
   UI_MODE,
   getMainWindow,
 } from './uploaderContext';
+import { DISK_QUOTA_EXCEEDED, FILES_IN_FOLDER_LIMIT_REACHED } from '../api/errors'
 
 class Uploader extends EventEmitter {
   static getSha1(buffer) {
@@ -141,7 +142,6 @@ class Uploader extends EventEmitter {
       this.state.filesArray = files;
       return files;
     } catch (err) {
-      console.log({ err });
       this.onUploadFileEnd();
       return this.logger.logError({ errorMessage: err.message });
     }
@@ -303,8 +303,13 @@ class Uploader extends EventEmitter {
       this.onUploadFileEnd();
       return this.logger.logError({ errorMessage: 'empty response from filestore', name: filename });
     } catch (err) {
-      console.log({ err });
       this.onUploadFileEnd();
+
+      if ([FILES_IN_FOLDER_LIMIT_REACHED, DISK_QUOTA_EXCEEDED].includes(err.error.message)) {
+        console.log({ err: err.error });
+        this.emit('stop');
+      }
+
       return this.logger.logError({ errorMessage: err.message, name: filename });
     }
   }
@@ -415,7 +420,8 @@ class Uploader extends EventEmitter {
       accessToken,
     } = this.state;
     const { api } = this;
-    const uploadData = await api.getUploadFormData(accessToken, destinationFolder, null);
+    const uploadData = await api.getUploadFormData(accessToken, destinationFolder, null);;
+
     if (!(uploadData && uploadData.body && uploadData.body.status === 'success')) {
       return false;
     }

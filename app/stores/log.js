@@ -20,6 +20,8 @@ export default class LogStore {
 
   @observable isAborting = undefined;
 
+  @observable errors = [];
+
   constructor({ ipc }) {
     const $self = this;
     this.ipc = ipc;
@@ -31,7 +33,7 @@ export default class LogStore {
     ipc.on('logFileByHashStarted', (e, data) => $self.acceptEvent(data));
     ipc.on('logUploadProgress', (e, data) => $self.acceptEvent(data));
     ipc.on('logBytesRead', (e, data) => $self.updateBytesRead(data));
-
+    ipc.on('logError', (e, data) => $self.logError(data));
 
     ipc.on('started', (e, flag) => {
       if (flag === 'false'){
@@ -66,10 +68,15 @@ export default class LogStore {
     clearInterval(this.interval);
   }
 
+  @action.bound clearErrors() {
+    this.errors = [];
+  }
+
   acceptEvent (data) {
     if (!this.inProgress) {
       return;
     }
+
     try {
       const eventFile = JSON.parse(data);
       const existing = this.files.find(file => file.id && file.id === eventFile.id || file.name === eventFile.name);
@@ -79,6 +86,15 @@ export default class LogStore {
       } else {
         this.add(eventFile);
       }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  logError(data) {
+    try {
+      const parsed = JSON.parse(data);
+      this.errors.push(parsed);
     } catch (error) {
       console.error(error);
     }
