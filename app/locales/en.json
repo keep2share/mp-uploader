@@ -12,6 +12,7 @@
       "releaseLink": "download the latest version",
       "p3postfix": "anytime",
       "invalidToken": "Invalid token",
+      "accessFromIpDenied": "Access to this user from your ip address is denied",
       "placeholder": "Enter your token here"
     },
     "upload": {

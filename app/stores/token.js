@@ -39,8 +39,15 @@ export default class TokenStore {
       this.errorMessage = '';
     } catch (error) {
       this.isValid = false;
+
       if (error.statusCode === 403) {
         this.errorMessage = 'home.invalidToken';
+
+        if (error.error.extended) {
+          if (error.error.extended.errorCode === 53) {
+            this.errorMessage = 'home.accessFromIpDenied';
+          }
+        }
       } else {
         this.errorMessage = error.error.message;
       }
