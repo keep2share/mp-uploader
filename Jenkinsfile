@@ -20,7 +20,7 @@ pipeline {
                     -v '/var/lib/jenkins/.cache/electron':'/root/.cache/electron' \
                     -v '/var/lib/jenkins/.cache/electron-builder':'/root/.cache/electron-builder' \
                     'electronuserland/builder:wine' \
-                    /bin/bash -c 'cd /project && apt update && apt install -y npm && \
+                    /bin/bash -c 'cd /project && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DFA175A75104960E && apt update && apt install -y npm && \
                      npm install electron-builder && \
                      npm i && yarn package-wl'"
                 }
